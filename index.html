@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="fr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Trou Noir</title>
+<link rel="stylesheet" href="style.css">
+<script src="/_sdk.js"></script>
+</head>
+<body>
+<canvas id="bg"></canvas>
+<canvas id="fx"></canvas>
+<div id="flash"></div>
+<div id="vignette"></div>
+
+<main id="app">
+
+  <!-- ACCUEIL -->
+  <section id="v-home" class="view">
+    <div class="logo">TROU<span>NOIR</span></div>
+    <p class="tag">Réponds juste… ou sois aspiré.</p>
+    <div class="card home-card">
+      <label id="nameRow" class="hidden">Ton pseudo
+        <input id="pseudo" maxlength="16" autocomplete="off">
+      </label>
+      <button id="btnCreate" class="btn yellow big">🚀 Créer une salle</button>
+      <div class="or">ou rejoins tes potes</div>
+      <div class="join-row">
+        <input id="code" maxlength="6" placeholder="CODE" autocapitalize="characters" autocomplete="off">
+        <button id="btnJoin" class="btn">Rejoindre</button>
+      </div>
+      <button id="btnRules" class="btn link">📖 Les règles</button>
+      <p id="homeNote" class="note hidden"></p>
+    </div>
+  </section>
+
+  <!-- SALON -->
+  <section id="v-lobby" class="view hidden">
+    <div class="card lobby-card">
+      <div class="room-line">Salle <b id="roomCode">----</b>
+        <button id="btnCopy" class="btn small" title="Copier le code">📋</button>
+      </div>
+      <ul id="lobbyList" class="plist"></ul>
+      <p id="lobbyHint" class="note"></p>
+      <button id="btnStart" class="btn yellow big">💥 Lancer la partie</button>
+      <button id="btnRules2" class="btn link">📖 Les règles</button>
+      <button id="btnLeave1" class="btn link">Quitter la salle</button>
+    </div>
+  </section>
+
+  <!-- PARTIE -->
+  <section id="v-game" class="view hidden">
+    <div class="game-grid">
+      <div class="play">
+        <div class="topbar">
+          <span id="roundInfo" class="pill"></span>
+          <span id="kindBadge" class="badge hidden"></span>
+          <span id="meInfo" class="pill"></span>
+          <button id="btnQuit" class="btn small" title="Quitter">⎋</button>
+        </div>
+        <div class="timer"><div id="timerBar"></div></div>
+        <div id="qcard" class="card qcard">
+          <div id="qtheme" class="chip"></div>
+          <h2 id="qtext">…</h2>
+          <div id="opts" class="opts"></div>
+          <div id="qstatus" class="note"></div>
+        </div>
+        <div id="react" class="react">
+          <button data-e="😂">😂</button><button data-e="😱">😱</button>
+          <button data-e="🔥">🔥</button><button data-e="👏">👏</button>
+          <button data-e="💀">💀</button>
+        </div>
+      </div>
+      <aside class="ladder-wrap">
+        <ol id="ladder"></ol>
+        <ul id="log"></ul>
+      </aside>
+    </div>
+  </section>
+
+  <!-- FIN -->
+  <section id="v-end" class="view hidden">
+    <div class="card end-card">
+      <h1 id="endTitle">FIN</h1>
+      <p id="endSub" class="note"></p>
+      <ol id="rank" class="rank"></ol>
+      <button id="btnReplay" class="btn yellow big">🔁 Rejouer</button>
+      <p id="endHint" class="note"></p>
+      <button id="btnLeave2" class="btn link">Quitter</button>
+    </div>
+  </section>
+
+</main>
+
+<div id="overlay" class="hidden"></div>
+<div id="banner"></div>
+<div id="toast"></div>
+
+<div id="rules" class="modal hidden">
+  <div class="card">
+    <h2>📖 Règles</h2>
+    <ul>
+      <li>Tout le monde répond <b>en même temps</b> à la même question (4 choix).</li>
+      <li>Mauvaise réponse ou trop lent : tu <b>descends d'un niveau</b>.</li>
+      <li>Le <b>plus rapide des bons</b> répondants <b>sacrifie</b> un adversaire : il descend aussi !</li>
+      <li>💥 <b>Chute double</b> : une erreur = deux niveaux. ⚡ <b>Éclair</b> : seulement 7 secondes.</li>
+      <li>Tout en bas, c'est le <b>trou noir</b> : tu es aspiré.</li>
+      <li>Le dernier survivant gagne. Le but : ne pas perdre.</li>
+    </ul>
+    <button id="btnRulesClose" class="btn yellow">Compris !</button>
+  </div>
+</div>
+
+<button id="mute" class="mute" title="Son">🔊</button>
+
+<script src="questions-1.js"></script>
+<script src="questions-2.js"></script>
+<script src="questions-3.js"></script>
+<script src="questions-4.js"></script>
+<script src="net.js"></script>
+<script src="fx.js"></script>
+<script src="ui.js"></script>
+<script src="phases.js"></script>
+<script src="game.js"></script>
+</body>
+</html>
