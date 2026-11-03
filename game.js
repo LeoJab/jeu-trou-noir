@@ -19,8 +19,8 @@ function applyState(s) {
 }
 function publish(patch) {
   const s = Object.assign({}, G.S || {}, patch, { v: (G.S ? G.S.v : 0) + 1 });
+  applyState(s); // d'abord en local : l'écho de la salle (même version) sera ignoré
   G.room.send({ t: 'st', s }, { keep: true });
-  applyState(s);
 }
 function finish(s) {
   if (finDone === s.gid) return;

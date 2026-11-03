@@ -4,12 +4,14 @@
   const me = () => (G.S.pl || []).find(p => p.id === G.myId);
   const canPlay = () => { const m = me(); return !!(m && m.alive); };
   const names = ids => ids.length > 3 ? ids.length + ' joueurs' : ids.map(UI.nameOf).join(', ');
+  // la question s'affiche devant l'échelle ; elle s'efface pour laisser voir les chutes
+  const card = on => { $('qcard').classList.toggle('show', on); $('qback').classList.toggle('hidden', !on); };
 
   function updateTop() {
     const s = G.S, m = me(), kb = $('kindBadge');
     $('roundInfo').textContent = s.round ? 'Manche ' + s.round : 'Décollage';
     $('meInfo').textContent = !m ? '👀 Spectateur' : m.alive ? '🧠 ' + LV[m.lv] : '☠️ Aspiré·e';
-    if (s.ph === 'q' && s.kind !== 'n') { kb.className = 'badge ' + s.kind; kb.textContent = s.kind === 'd' ? '💥 CHUTE DOUBLE' : '⚡ ÉCLAIR'; }
+    if ((s.ph === 'q' || s.ph === 'r') && s.kind !== 'n') { kb.className = 'badge ' + s.kind; kb.textContent = s.kind === 'd' ? '💥 CHUTE DOUBLE' : '⚡ ÉCLAIR'; }
     else kb.className = 'badge hidden';
   }
 
@@ -53,7 +55,7 @@
   }
 
   function phIntro(fresh) {
-    UI.resetTokens(); stopTimer();
+    UI.resetTokens(); stopTimer(); card(false);
     $('qtheme').textContent = '🚨 Alerte'; $('qtext').textContent = 'Préparez-vous…'; $('opts').innerHTML = '';
     $('qstatus').textContent = ''; $('timerBar').style.width = '100%';
     UI.drawLadder(true); updateTop();
@@ -65,7 +67,7 @@
 
   function phQuestion(fresh) {
     const s = G.S;
-    UI.hideOverlay(); G.answered = new Set(); G.myAns = null;
+    UI.hideOverlay(); G.answered = new Set(); G.myAns = null; card(true);
     buildOpts(s, canPlay());
     $('qstatus').textContent = canPlay() ? 'Réponds vite ! Le plus rapide des bons sacrifie un adversaire.'
       : (me() ? 'Tu es aspiré·e… tu regardes la suite 👀' : 'Partie en cours : tu regardes en spectateur 👀');
@@ -74,12 +76,12 @@
     FX.sfx.ask();
     const m = me();
     if (m && m.alive && m.lv >= HOLE - 1) setTimeout(FX.sfx.heart, 400);
-    if (!fresh && s.kind !== 'n') { UI.banner(s.kind === 'd' ? '💥 CHUTE DOUBLE !' : '⚡ QUESTION ÉCLAIR !', s.kind === 'd' ? 'red' : 'gold'); FX.shake(400); }
+    if (!fresh && s.kind !== 'n') FX.shake(400);
   }
 
   function phReveal(fresh) {
     const s = G.S, c = s.q.c, mine = s.res && s.res[G.myId];
-    UI.hideOverlay(); stopTimer(); $('timerBar').style.width = '0%';
+    UI.hideOverlay(); stopTimer(); $('timerBar').style.width = '0%'; card(true);
     if ($('opts').children.length !== 4) buildOpts(s, false);
     const chosen = G.myAns !== null ? G.myAns : (mine ? mine.a : -1);
     [...$('opts').children].forEach((b, j) => {
@@ -91,20 +93,27 @@
     $('qstatus').textContent = (mine ? (mine.ok ? '✅ Bonne réponse !' : (mine.a < 0 ? '⌛ Trop lent…' : '❌ Raté…')) : 'Résultat de la manche')
       + (s.win === G.myId ? ' ⚡ Tu es le plus rapide !' : '');
     UI.log(fallen.length ? `M${s.round} : ${names(fallen)} ${fallen.length > 1 ? 'chutent' : 'chute'}` : `M${s.round} : sans faute !`);
-    if (!fresh) {
-      if (mine) {
-        if (mine.ok) { FX.sfx.good(); FX.burst(innerWidth / 2, innerHeight * 0.4, '#3ddc97', 30); }
-        else { FX.sfx.bad(); FX.flash('#ff4d6d', 500); FX.shake(500); }
-      }
-      UI.banner(fallen.length ? `📉 ${names(fallen)} ${fallen.length > 1 ? 'chutent' : 'chute'}${fall > 1 ? ' de 2 niveaux' : ''} !` : '🎉 Sans faute !', fallen.length ? 'red' : 'green');
-      if (s.win) UI.banner(`⚡ ${UI.nameOf(s.win)} est le plus rapide !`, 'gold');
+    if (!fresh && mine) {
+      if (mine.ok) { FX.sfx.good(); FX.burst(innerWidth / 2, innerHeight * 0.4, '#3ddc97', 30); }
+      else { FX.sfx.bad(); FX.flash('#ff4d6d', 500); FX.shake(500); }
     }
-    UI.drawLadder(fresh); updateTop();
+    // la correction reste devant ~2 s, puis la question s'efface et on voit les chutes (annonces comprises)
+    const showFalls = () => {
+      if (G.S.v !== s.v) return;
+      UI.hold = false; card(false);
+      if (!fresh) {
+        UI.banner(fallen.length ? `📉 ${names(fallen)} ${fallen.length > 1 ? 'chutent' : 'chute'}${fall > 1 ? ' de 2 niveaux' : ''} !` : '🎉 Sans faute !', fallen.length ? 'red' : 'green');
+        if (s.win) UI.banner(`⚡ ${UI.nameOf(s.win)} est le plus rapide !`, 'gold');
+      }
+      UI.drawLadder(fresh); updateTop();
+    };
+    updateTop();
+    if (fresh) showFalls(); else { UI.hold = true; setTimeout(showFalls, 2000); }
   }
 
   function phPower(fresh) {
     const s = G.S;
-    updateTop();
+    card(false); updateTop();
     if (s.win === G.myId && canPlay()) {
       const box = UI.el('div', 'targets');
       s.pl.filter(p => p.alive && p.id !== s.win).forEach(p => {
@@ -122,7 +131,7 @@
 
   function phFall(fresh) {
     const s = G.S;
-    UI.hideOverlay();
+    UI.hideOverlay(); card(false);
     UI.log(`M${s.round} : ${UI.nameOf(s.win)} sacrifie ${UI.nameOf(s.hit)}`);
     if (!fresh) {
       UI.banner(`💥 ${UI.nameOf(s.win)} sacrifie ${UI.nameOf(s.hit)} !`, 'red');
@@ -134,7 +143,7 @@
 
   function renderEnd(fresh) {
     const s = G.S, w = s.winners || [], iWon = w.includes(G.myId), inGame = !!me();
-    UI.hideOverlay(); stopTimer(); UI.showView('end'); FX.setDanger(0);
+    UI.hideOverlay(); stopTimer(); card(false); UI.showView('end'); FX.setDanger(0);
     $('endTitle').textContent = iWon ? '🏆 VICTOIRE !' : inGame ? '☠️ ASPIRÉ·E…' : '🏁 FIN DE PARTIE';
     $('endSub').textContent = w.length === 1 ? `${UI.nameOf(w[0])} est le dernier survivant !`
       : w.length > 1 ? 'Égalité : ' + w.map(UI.nameOf).join(' & ') : 'Personne n\'a survécu au trou noir…';
@@ -157,9 +166,10 @@
 
   UI.render = prev => {
     const s = G.S;
+    UI.hold = false;
     if (!s || s.ph === 'lobby') {
       if (prev && prev.ph && prev.ph !== 'lobby') UI.resetTokens();
-      stopTimer(); UI.hideOverlay(); FX.setDanger(0); UI.showView('lobby'); UI.renderLobby(); return;
+      stopTimer(); card(false); UI.hideOverlay(); FX.setDanger(0); UI.showView('lobby'); UI.renderLobby(); return;
     }
     const fresh = !prev || prev.gid !== s.gid || s.v - prev.v > 1;
     if (s.ph === 'end') { renderEnd(fresh); return; }
@@ -176,7 +186,7 @@
     const s = G.S;
     if (!s || s.ph === 'lobby') UI.renderLobby();
     else if (s.ph === 'end') $('btnReplay').classList.toggle('hidden', !G.isHost);
-    else UI.drawLadder(true);
+    else if (!UI.hold) UI.drawLadder(true);
   };
   UI.onAnswer = () => {
     const s = G.S;

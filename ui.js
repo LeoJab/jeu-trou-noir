@@ -1,6 +1,7 @@
 // Interface : constantes, jetons, échelle, salon, annonces. (Les phases de jeu sont dans phases.js)
 const $ = id => document.getElementById(id);
-const LV = ['Cerveau galactique', 'Astro-génie', 'Capitaine', 'Pilote', 'Cadet', 'Stagiaire', 'Poussière d\'étoile'];
+const LV = ['Cerveau galactique', 'Astro-génie', 'Commandant', 'Capitaine', 'Lieutenant', 'Pilote', 'Navigateur', 'Cadet', 'Mécano',
+  'Stagiaire', 'Passager clandestin', 'Poussière d\'étoile'];
 const HOLE = LV.length; // index de la ligne « trou noir »
 const THEMES = { Histoire: '🏛️', Géo: '🌍', Sciences: '🔬', Nature: '🌿', Cinéma: '🎬', Musique: '🎵', Arts: '🎨', Sport: '⚽', Gastronomie: '🍽️', Divers: '🎲' };
 

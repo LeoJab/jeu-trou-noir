@@ -48,33 +48,33 @@
     </div>
   </section>
 
-  <!-- PARTIE -->
+  <!-- PARTIE : l'échelle est au centre, la question s'affiche devant -->
   <section id="v-game" class="view hidden">
     <div class="game-grid">
       <div class="play">
         <div class="topbar">
           <span id="roundInfo" class="pill"></span>
-          <span id="kindBadge" class="badge hidden"></span>
           <span id="meInfo" class="pill"></span>
           <button id="btnQuit" class="btn small" title="Quitter">⎋</button>
-        </div>
-        <div class="timer"><div id="timerBar"></div></div>
-        <div id="qcard" class="card qcard">
-          <div id="qtheme" class="chip"></div>
-          <h2 id="qtext">…</h2>
-          <div id="opts" class="opts"></div>
-          <div id="qstatus" class="note"></div>
-        </div>
-        <div id="react" class="react">
-          <button data-e="😂">😂</button><button data-e="😱">😱</button>
-          <button data-e="🔥">🔥</button><button data-e="👏">👏</button>
-          <button data-e="💀">💀</button>
         </div>
       </div>
       <aside class="ladder-wrap">
         <ol id="ladder"></ol>
-        <ul id="log"></ul>
       </aside>
+    </div>
+    <ul id="log"></ul>
+    <div id="react" class="react">
+      <button data-e="😂">😂</button><button data-e="😱">😱</button>
+      <button data-e="🔥">🔥</button><button data-e="👏">👏</button>
+      <button data-e="💀">💀</button>
+    </div>
+    <div id="qback" class="hidden"></div>
+    <div id="qcard" class="card qcard">
+      <div class="timer"><div id="timerBar"></div></div>
+      <div class="qhead"><span id="qtheme" class="chip"></span><span id="kindBadge" class="badge hidden"></span></div>
+      <h2 id="qtext">…</h2>
+      <div id="opts" class="opts"></div>
+      <div id="qstatus" class="note"></div>
     </div>
   </section>
 
